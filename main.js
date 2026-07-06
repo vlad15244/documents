@@ -63,11 +63,11 @@ app.get('/', async(req, res ) => {
 });
 
 
-
-app.get('/update', async(req, res ) => {
+app.post('/update/:id', async(req, res ) => {
 
     try{
-        table.Update();
+        const [rows] = await pool.query(table.Update(), [req.body.name, req.body.car, req.params.id]);
+        res.redirect('/'); 
     }
     catch(err){
         console.error('Ошибка при получении данных:', err);
