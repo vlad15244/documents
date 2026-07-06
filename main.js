@@ -18,7 +18,7 @@ const dbConfig = {
 };
 
 const pool = mysql.createPool(dbConfig);
-const table = new Table('node_ex');
+const table = new Table('my_orders');
 const app = express();
 
 // Подключаем EJS как движок шаблонов
@@ -26,14 +26,19 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 
-
+const STATUS_ORDER = {
+  ready: { label: 'Сделана', color: '#28a745' },   // Зеленый
+  pending: { label: 'В работе', color: '#ffc107' } // Желтый
+};
 
 (async () => {
     const connection = await pool.getConnection();
 
     table.AddColumn(new Column('ID', 'BIGINT','NOT NULL AUTO_INCREMENT'));
-    table.AddColumn(new Column('NAME', 'VARCHAR(45)', 'NOT NULL'));
-    table.AddColumn(new Column('CAR', 'VARCHAR(45)', 'NOT NULL'));
+    table.AddColumn(new Column('NUMBER', 'SMALLINT', 'NOT NULL')); //Номер заказ наряда
+    table.AddColumn(new Column('STATUS', 'VARCHAR(45)', 'NOT NULL')); //Статус
+    table.AddColumn(new Column('DATESTAMP', 'DATETIME', 'NOT NULL')); //Дата, когда сделана заявка   
+
     table.Verification();
 
 
@@ -54,7 +59,7 @@ app.get('/', async(req, res ) => {
     try{
         const [rows] = await pool.query(table.SelectAll());
 
-        res.render('index', {title : 'Пример работы с БД', rows : rows});
+        res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0});
     }
     catch(err){
         console.error('Ошибка при получении данных:', err);
