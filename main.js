@@ -35,7 +35,7 @@ const STATUS_ORDER = {
     const connection = await pool.getConnection();
 
     table.AddColumn(new Column('ID', 'BIGINT','NOT NULL AUTO_INCREMENT'));
-    table.AddColumn(new Column('NUMBER', 'SMALLINT', 'NOT NULL')); //Номер заказ наряда
+    table.AddColumn(new Column('NUMBER', 'BIGINT', 'NOT NULL')); //Номер заказ наряда
     table.AddColumn(new Column('STATUS', 'VARCHAR(45)', 'NOT NULL')); //Статус
     table.AddColumn(new Column('DATESTAMP', 'DATETIME', 'NOT NULL')); //Дата, когда сделана заявка   
 
@@ -59,7 +59,15 @@ app.get('/', async(req, res ) => {
     try{
         const [rows] = await pool.query(table.SelectAll());
 
-        res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0});
+        rows.forEach(row =>
+            {
+                row.formattedDate = new Date(row.DATESTAMP).toLocaleDateString('ru-RU');    
+            }
+        )
+
+        res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER});
+
+
     }
     catch(err){
         console.error('Ошибка при получении данных:', err);
@@ -98,14 +106,19 @@ app.get('/view/:id', async(req, res ) => {
 app.post('/add', async(req, res) => {
     
         const text_from = req.body.name;
-        const car_ = req.body.car;
+        const status_order = req.body.orderStatus;
+        const date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        if (req.body.date){
+            date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        }
 
         if (!text_from || typeof text_from !== 'string') {
             return res.status(400).json({ error: 'Отсутствует или неверное поле "text"' });
         }
 
         try{
-            const [rows] = await pool.query(table.Insert(), [text_from, car_]);   
+            const [rows] = await pool.query(table.Insert(), [text_from, status_order, date_]);   
             
             
             res.redirect('/'); 
@@ -122,7 +135,7 @@ app.get('/add', async(req, res) => {
     
     try{
         
-        res.render('add');
+        res.render('add', {statuses : STATUS_ORDER});
 
     }
     catch(err){

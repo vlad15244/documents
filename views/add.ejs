@@ -4,13 +4,16 @@
   <h1>Данные для добавления</h1>
     <form action="/add" method="post">
       <input type="text" name="name" placeholder="Введите ваш номер">    
-      <label for="car-select">Выберите марку автомобиля:</label>
-      <select id="car-select" name="car">
-        <option value="">--Выберите вариант--</option>
-        <option value="bmw">BMW</option>
-        <option value="audi" selected>Audi</option>
-        <option value="mers">Mercedes</option>
-      </select>  
+      <label for="status-select">Статус:</label>
+      <select name="orderStatus" id="orderStatus">
+        <option value="" disabled selected>Выберите статус</option>
+        <% for (const key in statuses) { %>
+          <% const status = statuses[key]; %>
+          <option value="<%= key %>" style="color: <%= status.color %>;">
+            <%= status.label %>
+          </option>
+        <% } %>
+      </select>
       <button type="submit">Добавить</button>
   </form>
 </body>
