@@ -82,6 +82,11 @@ export class Table{
 
     }
 
+    Delete(){
+        let Query = `DELETE FROM ${this.name} WHERE ID = ?`;
+        return Query;
+    }    
+
     Update(){
         let Query = `UPDATE ${this.name} SET `;
 

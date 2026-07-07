@@ -28,7 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 
 const STATUS_ORDER = {
   ready: { label: 'Сделана', color: '#28a745' },   // Зеленый
-  pending: { label: 'В работе', color: '#ffc107' } // Желтый
+  pending: { label: 'В работе', color: '#ffc107' }, // Желтый
+  obsolete: { label: 'Изменена', color: '#bd2ca9' } // Желтый  
 };
 
 (async () => {
@@ -88,6 +89,18 @@ app.post('/update/:id', async(req, res ) => {
     }
 });
 
+app.get('/delete/:id', async(req, res ) => {
+
+    try{
+        const [rows] = await pool.query(table.Delete(), [req.params.id]);
+        res.redirect('/'); 
+    }
+    catch(err){
+        console.error('Ошибка при получении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
+
 app.get('/view/:id', async(req, res ) => {
 
     try{
@@ -107,10 +120,10 @@ app.post('/add', async(req, res) => {
     
         const text_from = req.body.name;
         const status_order = req.body.orderStatus;
-        const date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        let date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-        if (req.body.date){
-            date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        if (req.body.order_date){
+            date_ = req.body.order_date;
         }
 
         if (!text_from || typeof text_from !== 'string') {

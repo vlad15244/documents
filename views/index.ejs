@@ -37,13 +37,17 @@
         <tr>
           <td><%= rows.ID %></td>
           <td><%= rows.NUMBER %></td>
-          <td><%= rows.STATUS %></td> 
+          <td style="background-color: <%= statuses[rows.STATUS].color %>;"><%= statuses[rows.STATUS].label %></td> 
           <td><%= rows.formattedDate %></td>           
 
           <td>  
             <form action="/view/<%= rows.ID%>" method="get">
               <button type="submit">Открыть</button>
-            </form></td>                    
+            </form></td>
+            <td>
+            <form action="/delete/<%= rows.ID%>" method="get">
+              <button type="submit">Удалить</button>
+            </form></td>                                
         </tr>
       <% }); %>
     </tbody>
