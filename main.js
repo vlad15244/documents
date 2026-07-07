@@ -4,6 +4,7 @@ import mysql from 'mysql2/promise';
 import http from 'http';
 import express from 'express';
 import path from 'path';
+import multer from 'multer';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,6 +21,17 @@ const dbConfig = {
 const pool = mysql.createPool(dbConfig);
 const table = new Table('my_orders');
 const app = express();
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // папка должна существовать
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // уникальное имя
+  }
+});
+
+const upload = multer({ storage: storage });
 
 // Подключаем EJS как движок шаблонов
 app.set('view engine', 'ejs');
@@ -39,6 +51,7 @@ const STATUS_ORDER = {
     table.AddColumn(new Column('NUMBER', 'BIGINT', 'NOT NULL')); //Номер заказ наряда
     table.AddColumn(new Column('STATUS', 'VARCHAR(45)', 'NOT NULL')); //Статус
     table.AddColumn(new Column('DATESTAMP', 'DATETIME', 'NOT NULL')); //Дата, когда сделана заявка   
+    table.AddColumn(new Column('FILEPATH', 'VARCHAR(250)', 'NOT NULL')); //Дата, когда сделана заявка       
 
     table.Verification();
 
@@ -116,11 +129,14 @@ app.get('/view/:id', async(req, res ) => {
 });
 
 
-app.post('/add', async(req, res) => {
+app.post('/add',upload.single('file'), async(req, res) => {
     
         const text_from = req.body.name;
         const status_order = req.body.orderStatus;
         let date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        let filename = req.file.path;
+
+        console.log(filename);
 
         if (req.body.order_date){
             date_ = req.body.order_date;
@@ -129,6 +145,10 @@ app.post('/add', async(req, res) => {
         if (!text_from || typeof text_from !== 'string') {
             return res.status(400).json({ error: 'Отсутствует или неверное поле "text"' });
         }
+
+        if (status_order == null) {
+            return res.status(400).json({ error: 'Неуказан статус' });
+        }        
 
         try{
             const [rows] = await pool.query(table.Insert(), [text_from, status_order, date_]);   
@@ -148,7 +168,8 @@ app.get('/add', async(req, res) => {
     
     try{
         
-        res.render('add', {statuses : STATUS_ORDER});
+        res.render('add', {title : 'Добавление новой заявки', statuses : STATUS_ORDER});
+
 
     }
     catch(err){

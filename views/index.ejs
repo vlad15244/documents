@@ -18,7 +18,21 @@
       font-size: 0.85rem;
       font-weight: bold;
     }
+    button {
+        padding: 8px 30px;
+        border-radius: 6px;
+        margin-top: 8px;
+        border: 2px solid #b7c612;
+        cursor: pointer;
+    }
+    button.in_cell {
+        padding: 8px 30px;
+        border-radius: 6px;
+        border: 2px solid #b7c612;
+        cursor: pointer;
+    }
   </style>
+
 </head>
 <body>
   <h1><%= title %></h1>
@@ -40,11 +54,11 @@
           <td style="background-color: <%= statuses[rows.STATUS].color %>;"><%= statuses[rows.STATUS].label %></td> 
           <td><%= rows.formattedDate %></td>           
 
-          <td>  
+          <td style="text-align: center; vertical-align: middle;">  
             <form action="/view/<%= rows.ID%>" method="get">
               <button type="submit">Открыть</button>
             </form></td>
-            <td>
+            <td style="text-align: center; vertical-align: middle;">
             <form action="/delete/<%= rows.ID%>" method="get">
               <button type="submit">Удалить</button>
             </form></td>                                
@@ -56,10 +70,7 @@
   <h2>Записей не найдено...</h2>
   <% } %>
   <form action="/add" method="get">
-    <button type="submit">Добавить</button>
-  </form>
-  <form action="/update" method="get">
-    <button type="submit">Обновить</button>
+    <button class = "in_cell" type="submit">Добавить</button>
   </form>
 </body>
 </html>
