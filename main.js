@@ -119,7 +119,13 @@ app.get('/view/:id', async(req, res ) => {
     try{
         const row = await pool.query(table.SelectByID(), [req.params.id]); //Тут всегда массив
 
-        res.render('view', {title : 'Получение одно  строки', row : row[0]}); 
+        row.forEach(elem =>
+            {
+                elem.formattedDate = moment(dateString).format('YYYY-MM-DD');    
+            }
+        )
+        console.log(row);
+        res.render('view', {title : 'Изменение записи заявки', row : row[0], statuses : STATUS_ORDER}); 
 
     }
     catch(err){
