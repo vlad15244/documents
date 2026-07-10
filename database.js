@@ -73,7 +73,20 @@ export class Table{
     SelectByID(){
         let Query = `SELECT * FROM ${this.name} WHERE ${this.columns[0].ToString('', false)} = ?;`;
         return Query;        
-    }    
+    } 
+    
+    Filter(...args){
+        let Query = `SELECT * FROM ${this.name} WHERE `;
+
+        for (const agr of args){
+            Query += `${agr} = ? AND`;
+        }
+        
+        Query = Query.slice(0, -3);
+
+        return Query;             
+    }
+
 
     Insert(){
         let Query = `INSERT INTO ${this.name} (${this.getFullColumnName()}) VALUES (${this.getFullPlaceholders()})`;

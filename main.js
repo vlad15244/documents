@@ -6,6 +6,7 @@ import express from 'express';
 import path from 'path';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
+import console from 'console';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -24,7 +25,7 @@ const app = express();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // папка должна существовать
+    cb(null, path.join(__dirname, 'uploads')); // папка должна существовать
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname)); // уникальное имя
@@ -39,9 +40,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 
 const STATUS_ORDER = {
-  ready: { label: 'Сделана', color: '#28a745' },   // Зеленый
-  pending: { label: 'В работе', color: '#ffc107' }, // Желтый
-  obsolete: { label: 'Изменена', color: '#bd2ca9' } // Желтый  
+  ready: { label: 'Сделана', color: '#28a745', text : 'ready' },   // Зеленый
+  pending: { label: 'В работе', color: '#ffc107', text : 'pending' }, // Желтый
+  obsolete: { label: 'Изменена', color: '#bd2ca9', text : 'obsolete' } // Желтый  
 };
 
 (async () => {
@@ -50,8 +51,7 @@ const STATUS_ORDER = {
     table.AddColumn(new Column('ID', 'BIGINT','NOT NULL AUTO_INCREMENT'));
     table.AddColumn(new Column('NUMBER', 'BIGINT', 'NOT NULL')); //Номер заказ наряда
     table.AddColumn(new Column('STATUS', 'VARCHAR(45)', 'NOT NULL')); //Статус
-    table.AddColumn(new Column('DATESTAMP', 'DATETIME', 'NOT NULL')); //Дата, когда сделана заявка   
-    table.AddColumn(new Column('FILEPATH', 'VARCHAR(250)', 'NOT NULL')); //Дата, когда сделана заявка       
+    table.AddColumn(new Column('DATESTAMP', 'DATETIME', 'NOT NULL')); //Дата, когда сделана заявка         
 
     table.Verification();
 
@@ -129,15 +129,14 @@ app.get('/view/:id', async(req, res ) => {
 });
 
 
-app.post('/add',upload.single('file'), async(req, res) => {
+app.post('/add', async(req, res) => {
     
         const text_from = req.body.name;
         const status_order = req.body.orderStatus;
         let date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        let filename = req.file.path;
 
-        console.log(filename);
 
+        
         if (req.body.order_date){
             date_ = req.body.order_date;
         }
@@ -178,6 +177,23 @@ app.get('/add', async(req, res) => {
     }  
 
 })
+
+app.post('/filter', async(req, res) => {
+    
+    try{
+
+        console.log(req.body);
+        //const [rows] = await pool.query(table.Filter('status'), [status]);
+        //res.send({rows : rows});
+
+    }
+    catch(err){
+        console.error('Ошибка при добавлении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');                
+    }  
+
+})
+
 
 
 app.listen(PORT, () => {

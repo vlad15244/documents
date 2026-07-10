@@ -35,8 +35,27 @@
 
 </head>
 <body>
+
+
   <h1><%= title %></h1>
   <% if (data_yes) { %>
+  <form action="/sorted" method="get">
+      <select name="orderStatus" id="orderStatus">
+        <option value="" disabled selected>Выберите статус</option>
+        <% for (const key in statuses) { %>
+          <% const status = statuses[key]; %>
+          <option value="<%= key %>" style="color: <%= status.color %>;">
+            <%= status.label %>
+          </option>
+        <% } %>
+      </select>
+  </form>
+
+    <script scr="fetch_data.js" defer>
+
+
+    </script>  
+
   <table>
     <thead>
       <tr>
