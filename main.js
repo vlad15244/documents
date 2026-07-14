@@ -22,6 +22,7 @@ const dbConfig = {
 const pool = mysql.createPool(dbConfig);
 const table = new Table('my_orders');
 const app = express();
+app.use(express.json()); 
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -33,11 +34,12 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
+app.use(express.static(path.join(__dirname, 'public')));
 // Подключаем EJS как движок шаблонов
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
+
 
 const STATUS_ORDER = {
   ready: { label: 'Сделана', color: '#28a745', text : 'ready' },   // Зеленый
@@ -188,9 +190,17 @@ app.post('/filter', async(req, res) => {
     
     try{
 
-        console.log(req.body);
-        //const [rows] = await pool.query(table.Filter('status'), [status]);
-        //res.send({rows : rows});
+        const { status } = req.body;
+        const query = table.Filter('status');
+        const [rows] = await pool.query(table.Filter('status'), [status]);
+
+        rows.forEach(elem =>
+            {
+                elem.formattedDate = moment(dateString).format('YYYY-MM-DD');    
+            }
+        )
+
+        res.send({rows : rows, length : rows.length, statuses : STATUS_ORDER});
 
     }
     catch(err){

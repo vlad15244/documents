@@ -1,0 +1,42 @@
+   body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    h2 { color: #21da7e; }    
+    table { width: 100%; border-collapse: collapse; background: white; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background: #eee; }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+    button {
+        padding: 8px 30px;
+        border-radius: 6px;
+        margin-top: 8px;
+        border: 2px solid #b7c612;
+        cursor: pointer;
+    }
+    button.in_cell {
+        padding: 8px 30px;
+        border-radius: 6px;
+        border: 2px solid #b7c612;
+        cursor: pointer;
+    }
+    input{
+        padding: 8px 30px;
+        border-radius: 6px;       
+        border: 2px solid #b7c612;
+        text-align: center;
+        font-family: 'Garamond', Times, serif;
+        font-size: small;
+    }
+    select{
+        padding: 8px 30px;
+        border-radius: 6px;       
+        border: 2px solid #b7c612;
+        text-align: center;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: small;
+    }   
