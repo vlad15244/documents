@@ -20,6 +20,7 @@
             <%= status.label %>
           </option>
         <% } %>
+      <option value="" style="color: #333;">Все заказы</option>
       </select>
   </form>
 <script>
@@ -52,22 +53,39 @@
         const rows = data[`rows`];
         const size = data[`length`];
         const statuses = data[`statuses`];
+        tbody.innerHTML = '';
+        let html = '';
 
         for (let i = 0; i < size; i++) { 
-            const tbody = table.querySelector('tbody') || table;
-            const row = tbody ? tbody.insertRow() : table.insertRow();
-            
-            row.insertCell().textContent = order.ID;
-            row.insertCell().textContent = order.NUMBER;
-            
-            /*const statusCell = row.insertCell();
-            statusCell.textContent = order.statusLabel;
-            statusCell.style.color = order.statusColor || 'black';
-            
-            row.insertCell().textContent = order.date;
-            row.insertCell().textContent = order.price; */         
+
+        const statusInfo = statuses[rows[i].STATUS];
+        const color = statusInfo?.color ?? '#eee';
+        const label = statusInfo?.label ?? rows[i].STATUS; 
+
+        html += `
+            <tr>
+              <td>${rows[i].ID}</td>
+              <td>${rows[i].NUMBER}</td>
+              <td style="background-color: ${color}; color: white;">
+                ${label}
+              </td>
+              <td>${rows[i].formattedDate}</td> 
+              <td style="text-align: center; vertical-align: middle;">  
+                <form action="/view/${rows[i].ID}" method="get">
+                  <button type="submit" style="padding: 5px 10px;">Открыть</button>
+                </form>
+              </td>
+              <td style="text-align: center; vertical-align: middle;">
+                <form action="/delete/${rows[i].ID}" method="get">
+                  <button type="submit" style="padding: 5px 10px; background-color: #ffcccc;">Удалить</button>
+                </form>
+              </td>                                                         
+            </tr>
+          `;
 
         }
+        tbody.innerHTML = html;
+
 
 
 

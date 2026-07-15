@@ -7,6 +7,7 @@ import path from 'path';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
 import console from 'console';
+import moment from 'moment';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -191,20 +192,28 @@ app.post('/filter', async(req, res) => {
     try{
 
         const { status } = req.body;
-        const query = table.Filter('status');
-        const [rows] = await pool.query(table.Filter('status'), [status]);
 
-        rows.forEach(elem =>
+        let rows = [];
+
+        if (status){
+            [rows] = await pool.query(table.Filter('status'), [status]);
+        }
+        else
+        {
+           [rows] = await pool.query(table.SelectAll());    
+        }
+
+
+        rows.forEach(row =>
             {
-                elem.formattedDate = moment(dateString).format('YYYY-MM-DD');    
+                row.formattedDate = new Date(row.DATESTAMP).toLocaleDateString('ru-RU');    
             }
         )
-
         res.send({rows : rows, length : rows.length, statuses : STATUS_ORDER});
 
     }
     catch(err){
-        console.error('Ошибка при добавлении данных:', err);
+        console.error('Ошибка при чтении данных:', err);
         res.status(500).send('Ошибка сервера: не удалось загрузить данные');                
     }  
 
