@@ -1,5 +1,6 @@
 import { Table } from './database.js';
 import { Column } from './database.js';
+import {convert_data} from './library.js';
 import mysql from 'mysql2/promise';
 import http from 'http';
 import express from 'express';
@@ -45,7 +46,8 @@ app.use(express.urlencoded({ extended: true }));
 const STATUS_ORDER = {
   ready: { label: 'Сделана', color: '#28a745', text : 'ready' },   // Зеленый
   pending: { label: 'В работе', color: '#ffc107', text : 'pending' }, // Желтый
-  obsolete: { label: 'Изменена', color: '#bd2ca9', text : 'obsolete' } // Желтый  
+  obsolete: { label: 'Изменена', color: '#bd2ca9', text : 'obsolete' }, //  
+  not_ready: { label: 'Необработана', color: '#a74b15', text : 'not_ready' } //  
 };
 
 (async () => {
@@ -96,7 +98,14 @@ app.get('/', async(req, res ) => {
 app.post('/update/:id', async(req, res ) => {
 
     try{
-        const [rows] = await pool.query(table.Update(), [req.body.name, req.body.car, req.params.id]);
+
+        let date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        if (req.body.order_date){
+            date_ = req.body.order_date;
+        }       
+
+        const [rows] = await pool.query(table.Update(), [req.body.name, req.body.orderStatus,date_, req.params.id]);
         res.redirect('/'); 
     }
     catch(err){
@@ -121,13 +130,9 @@ app.get('/view/:id', async(req, res ) => {
 
     try{
         const row = await pool.query(table.SelectByID(), [req.params.id]); //Тут всегда массив
-
-        row.forEach(elem =>
-            {
-                elem.formattedDate = moment(dateString).format('YYYY-MM-DD');    
-            }
-        )
-        console.log(row);
+        row[0].forEach(elem => {
+            elem.formattedDate = convert_data(new Date(elem.DATESTAMP).toLocaleDateString('ru-RU')); 
+        });
         res.render('view', {title : 'Изменение записи заявки', row : row[0], statuses : STATUS_ORDER}); 
 
     }
@@ -144,8 +149,6 @@ app.post('/add', async(req, res) => {
         const status_order = req.body.orderStatus;
         let date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-
-        
         if (req.body.order_date){
             date_ = req.body.order_date;
         }
@@ -175,9 +178,8 @@ app.post('/add', async(req, res) => {
 app.get('/add', async(req, res) => {
     
     try{
-        
+    
         res.render('add', {title : 'Добавление новой заявки', statuses : STATUS_ORDER});
-
 
     }
     catch(err){
@@ -206,7 +208,7 @@ app.post('/filter', async(req, res) => {
 
         rows.forEach(row =>
             {
-                row.formattedDate = new Date(row.DATESTAMP).toLocaleDateString('ru-RU');    
+                row.formattedDate = new Date(row.DATESTAMP).toLocaleDateString('ru-RU');  
             }
         )
         res.send({rows : rows, length : rows.length, statuses : STATUS_ORDER});
@@ -218,6 +220,7 @@ app.post('/filter', async(req, res) => {
     }  
 
 })
+
 
 
 

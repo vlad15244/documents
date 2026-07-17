@@ -125,7 +125,7 @@ export class Table{
 
         Query = Query.slice(0, -1);
         Query += ` WHERE ${this.columns[0].ToString('', false)} = ?;`;
-        console.log(Query);
+
 
         return Query;
     }
