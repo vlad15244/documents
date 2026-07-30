@@ -118,7 +118,7 @@ export class Table{
         let params = [];
 
         this.columns.forEach(element => {
-            if (element.ToString('', false) == 'ID')
+            if ((element.ToString('', false) == 'ID') || (element.isBlockUpdate == true))
             {
 
             }
@@ -170,10 +170,11 @@ export class Table{
 }
 
 export class Column {
-    constructor(name, params, add){
+    constructor(name, params, add, isBlockUpdate){
         this.name = name;
         this.params = params;
         this.add = add;
+        this.isBlockUpdate = isBlockUpdate;
     }
 
     ToString(separator, with_params){

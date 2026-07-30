@@ -8,7 +8,7 @@
 </head>
 <body>
   <h1>Данные для добавления</h1>
-    <form action="/add" method="post">
+    <form action="/add" method="post" enctype="multipart/form-data">
       <input type="text" name="name" placeholder="Введите ваш заказ-наряд">    
       <label for="status-select">Статус:</label>
       <select name="orderStatus" id="orderStatus">
@@ -22,6 +22,8 @@
       </select>
       <label for="order_date">Дата заявки:</label>
       <input type="date" id="order_date" name="order_date">
+      <label>Файл</label><br>
+      <input type="file" name="file" /><br><br> 
       <button type="submit">Добавить</button>
   </form>
 </body>

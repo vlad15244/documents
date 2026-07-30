@@ -105,7 +105,8 @@
       <th>ID</th>
       <th>Заказ-наряд</th>
       <th>Статус</th> 
-      <th>Дата заявки</th>                
+      <th>Дата заявки</th>
+      <th>Заявка</th>               
       <th>Действия</th> 
     </tr>
   </thead>
@@ -119,7 +120,14 @@
           <td style="background-color: <%= statuses[row.STATUS] ? statuses[row.STATUS].color : '#eee' %>; color: white;">
             <%= statuses[row.STATUS] ? statuses[row.STATUS].label : row.STATUS %>
           </td> 
-          <td><%= row.formattedDate %></td>           
+          <td><%= row.formattedDate %></td>   
+          <td>
+            <% if (row.file_yes) { %>
+              <form action="/dowloand_file/" method="get">
+                <button type="submit" style="padding: 5px 10px; background-color: #ffcccc;">Скачать файл</button>
+              </form>              
+            <% } %>
+          </td>                    
           <td style="text-align: center; vertical-align: middle;">  
             <form action="/view/<%= row.ID %>" method="get">
               <button type="submit" style="padding: 5px 10px;">Открыть</button>

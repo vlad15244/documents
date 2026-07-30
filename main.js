@@ -9,8 +9,18 @@ import multer from 'multer';
 import { fileURLToPath } from 'url';
 import console from 'console';
 import moment from 'moment';
+import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('Папка uploads создана:', uploadsDir);
+}
+else{
+  console.log('Папка uploads была уже создана');    
+}
 
 const PORT = 3000;
 
@@ -53,10 +63,11 @@ const STATUS_ORDER = {
 (async () => {
     const connection = await pool.getConnection();
 
-    table.AddColumn(new Column('ID', 'BIGINT','NOT NULL AUTO_INCREMENT'));
-    table.AddColumn(new Column('NUMBER', 'BIGINT', 'NOT NULL')); //Номер заказ наряда
-    table.AddColumn(new Column('STATUS', 'VARCHAR(45)', 'NOT NULL')); //Статус
-    table.AddColumn(new Column('DATESTAMP', 'DATETIME', 'NOT NULL')); //Дата, когда сделана заявка         
+    table.AddColumn(new Column('ID', 'BIGINT','NOT NULL AUTO_INCREMENT', true));
+    table.AddColumn(new Column('NUMBER', 'BIGINT', 'NOT NULL', false)); //Номер заказ наряда
+    table.AddColumn(new Column('STATUS', 'VARCHAR(45)', 'NOT NULL', false)); //Статус
+    table.AddColumn(new Column('DATESTAMP', 'DATETIME', 'NOT NULL', false)); //Дата, когда сделана заявка 
+    table.AddColumn(new Column('FILEPATH', 'VARCHAR(500)', 'NULL', true)); //Статус            
 
     table.Verification();
 
@@ -80,12 +91,12 @@ app.get('/', async(req, res ) => {
 
         rows.forEach(row =>
             {
-                row.formattedDate = new Date(row.DATESTAMP).toLocaleDateString('ru-RU');    
+                row.formattedDate = new Date(row.DATESTAMP).toLocaleDateString('ru-RU');
+                row.file_yes = row.FILEPATH !== '';   
             }
         )
 
         res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER});
-
 
     }
     catch(err){
@@ -166,11 +177,34 @@ app.get('/view/:id', async(req, res ) => {
 });
 
 
-app.post('/add', async(req, res) => {
+app.post('/add',upload.single('file'), async(req, res) => {
     
         const text_from = req.body.name;
         const status_order = req.body.orderStatus;
         let date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        let filedata = req.file;
+
+        if (!filedata) {
+            console.error('Файл не загружен: req.file === undefined');
+            return res.status(400).json({
+            error: 'Файл не загружен',
+            debug: {
+                contentType: req.headers['content-type'],
+                body: req.body
+            }
+            });
+        }
+
+        console.log('Файл получен:', {
+            originalName: filedata.originalname,
+            filename: filedata.filename,
+            path: filedata.path,
+            size: filedata.size,
+            mimetype: filedata.mimetype
+        });
+
+
+
 
         if (req.body.order_date){
             date_ = req.body.order_date;
@@ -185,7 +219,7 @@ app.post('/add', async(req, res) => {
         }        
 
         try{
-            const [rows] = await pool.query(table.Insert(), [text_from, status_order, date_]);   
+            const [rows] = await pool.query(table.Insert(), [text_from, status_order, date_, filedata.filename]);   
             
             
             res.redirect('/'); 
