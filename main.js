@@ -94,6 +94,29 @@ app.get('/', async(req, res ) => {
     }
 });
 
+app.get('/delete_all', async(req, res ) => {
+
+    try{
+        res.render('confirm', {title : 'Удление всех записей'});
+    }
+    catch(err){
+        console.error('Ошибка при получении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
+
+
+app.post('/delete_all', async(req, res ) => {
+
+    try{
+        const [rows] = await pool.query(table.DelteAll());
+        res.redirect('/');         
+    }
+    catch(err){
+        console.error('Ошибка при удалении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
 
 app.post('/update/:id', async(req, res ) => {
 
