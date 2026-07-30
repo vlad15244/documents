@@ -98,7 +98,19 @@ export class Table{
     Delete(){
         let Query = `DELETE FROM ${this.name} WHERE ID = ?`;
         return Query;
-    }    
+    }  
+    
+
+    DelteAll(){
+        let Query = `DELETE FROM ${this.name}`;
+        return Query;        
+    };
+
+    DropTable(){
+        let Query = `DROP TABLE IF EXISTS  ${this.name}`;
+        return Query;          
+    }
+
 
     Update(){
         let Query = `UPDATE ${this.name} SET `;
