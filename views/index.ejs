@@ -58,32 +58,44 @@
 
         for (let i = 0; i < size; i++) { 
 
-        const statusInfo = statuses[rows[i].STATUS];
-        const color = statusInfo?.color ?? '#eee';
-        const label = statusInfo?.label ?? rows[i].STATUS; 
+          const statusInfo = statuses[rows[i].STATUS];
+          const color = statusInfo?.color ?? '#eee';
+          const label = statusInfo?.label ?? rows[i].STATUS;
 
-        html += `
-            <tr>
-              <td>${rows[i].ID}</td>
-              <td>${rows[i].NUMBER}</td>
-              <td style="background-color: ${color}; color: white;">
-                ${label}
-              </td>
-              <td>${rows[i].formattedDate}</td> 
-              <td style="text-align: center; vertical-align: middle;">  
-                <form action="/view/${rows[i].ID}" method="get">
-                  <button type="submit" style="padding: 5px 10px;">Открыть</button>
-                </form>
-              </td>
-              <td style="text-align: center; vertical-align: middle;">
-                <form action="/delete/${rows[i].ID}" method="get">
-                  <button type="submit" style="padding: 5px 10px; background-color: #ffcccc;">Удалить</button>
-                </form>
-              </td>                                                         
-            </tr>
-          `;
+          let fileCellContent = '';
 
-        }
+          if (Boolean(rows[i].file_yes) == true) {
+            fileCellContent = `
+              <form action="/download_file/${rows[i].FILEPATH}" method="get">
+                <button type="submit" style="padding: 5px 10px; background-color: #ffcccc;">Скачать файл</button>
+              </form>`;
+          } else {
+            fileCellContent = 'Файл не добавлен';
+          }        
+
+          html += `
+              <tr>
+                <td>${rows[i].ID}</td>
+                <td>${rows[i].NUMBER}</td>
+                <td style="background-color: ${color}; color: white;">
+                  ${label}
+                </td>
+                <td>${rows[i].formattedDate}</td>
+                <td>${fileCellContent}</td>  
+                <td style="text-align: center; vertical-align: middle;">  
+                  <form action="/view/${rows[i].ID}" method="get">
+                    <button type="submit" style="padding: 5px 10px;">Открыть</button>
+                  </form>
+                </td>
+                <td style="text-align: center; vertical-align: middle;">
+                  <form action="/delete/${rows[i].ID}" method="get">
+                    <button type="submit" style="padding: 5px 10px; background-color: #ffcccc;">Удалить</button>
+                  </form>
+                </td>                                                         
+              </tr>
+            `;
+
+          }
         tbody.innerHTML = html;
 
 
@@ -123,10 +135,10 @@
           <td><%= row.formattedDate %></td>   
           <td>
             <% if (row.file_yes) { %>
-              <form action="/dowloand_file/" method="get">
+              <form action="/dowloand_file/<%= row.FILEPATH %>" method="get">
                 <button type="submit" style="padding: 5px 10px; background-color: #ffcccc;">Скачать файл</button>
               </form>              
-            <% } %>
+            <% } else { %> Файл добавлен <% } %>
           </td>                    
           <td style="text-align: center; vertical-align: middle;">  
             <form action="/view/<%= row.ID %>" method="get">

@@ -1,31 +1,61 @@
 <!DOCTYPE html>
 <html lang="ru">
   <head>
-  <meta charset="UTF-8" />
-  <title><%= title %></title>
+    <meta charset="UTF-8" />
+    <title><%= title %></title>
     <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <h1>Данные для добавления</h1>
 
-</head>
-<body>
-  <h1>Данные для добавления</h1>
     <form action="/add" method="post" enctype="multipart/form-data">
-      <input type="text" name="name" placeholder="Введите ваш заказ-наряд">    
-      <label for="status-select">Статус:</label>
-      <select name="orderStatus" id="orderStatus">
-        <option value="" disabled selected>Выберите статус</option>
-        <% for (const key in statuses) { %>
-          <% const status = statuses[key]; %>
-          <option value="<%= key %>" style="color: <%= status.color %>;">
-            <%= status.label %>
-          </option>
-        <% } %>
-      </select>
-      <label for="order_date">Дата заявки:</label>
-      <input type="date" id="order_date" name="order_date">
-      <label>Файл</label><br>
-      <input type="file" name="file" /><br><br> 
-      <button type="submit">Добавить</button>
-  </form>
-</body>
+      <div>
+        <label for="name">Заказ‑наряд</label>
+        <input type="text" id="name" name="name" placeholder="Введите ваш заказ-наряд">
+      </div>
 
+      <div>
+        <label for="orderStatus">Статус</label>
+        <select name="orderStatus" id="orderStatus">
+          <option value="" disabled selected>Выберите статус</option>
+          <% for (const key in statuses) { %>
+            <% const status = statuses[key]; %>
+            <option value="<%= key %>" style="color: <%= status.color %>;">
+              <%= status.label %>
+            </option>
+          <% } %>
+        </select>
+      </div>
+
+      <div>
+        <label for="order_date">Дата заявки</label>
+        <input type="date" id="order_date" name="order_date">
+      </div>
+
+      <div>
+        <label for="file">Файл</label>
+        <input type="file" id="file" name="file">
+      </div>
+
+      <div>
+        <label for="orderTypes">Тип</label>
+        <select name="orderType" id="orderTypes">
+          <option value="" disabled selected>Выберите тип</option>
+          <% for (const key in type) { %>
+            <% const onetype = type[key]; %>
+            <option value="<%= key %>">
+              <%= onetype.label %>
+            </option>
+          <% } %>
+        </select>
+      </div>
+
+      <div>
+        <label for="text_field">Комментарий</label>
+        <input type="text" id="text_field" name="text_field">
+      </div>
+
+      <button type="submit">Добавить</button>
+    </form>
+  </body>
 </html>

@@ -1,6 +1,7 @@
 import { Table } from './database.js';
 import { Column } from './database.js';
 import {convert_data} from './library.js';
+import {bind_rows} from './library.js';
 import mysql from 'mysql2/promise';
 import http from 'http';
 import express from 'express';
@@ -60,6 +61,14 @@ const STATUS_ORDER = {
   not_ready: { label: 'Необработана', color: '#a74b15', text : 'not_ready' } //  
 };
 
+const TYPE_ORDER = {
+  plc: { label: 'ПЛК', color: '#28a745', text : 'plc' },   
+  pc_with_scada: { label: 'ПК + SCADA', color: '#ffc107', text : 'pc_with_scada' },
+  only_scada: { label: 'SCADA', color: '#bd2ca9', text : 'SCADA' },   
+  devices: { label: 'Другое', color: '#a74b15', text : 'devices' }   
+};
+
+
 (async () => {
     const connection = await pool.getConnection();
 
@@ -67,7 +76,9 @@ const STATUS_ORDER = {
     table.AddColumn(new Column('NUMBER', 'BIGINT', 'NOT NULL', false)); //Номер заказ наряда
     table.AddColumn(new Column('STATUS', 'VARCHAR(45)', 'NOT NULL', false)); //Статус
     table.AddColumn(new Column('DATESTAMP', 'DATETIME', 'NOT NULL', false)); //Дата, когда сделана заявка 
-    table.AddColumn(new Column('FILEPATH', 'VARCHAR(500)', 'NULL', true)); //Статус            
+    table.AddColumn(new Column('FILEPATH', 'VARCHAR(500)', 'NULL', true)); //Наименование заявки 
+    table.AddColumn(new Column('TYPE_ORDER', 'VARCHAR(20)', 'NULL', true)); //Тип заявки - делаем не обновляемой.
+    table.AddColumn(new Column('COMMENTS', 'VARCHAR(500)', 'NULL', true)); //Просто комментарии                   
 
     table.Verification();
 
@@ -89,12 +100,7 @@ app.get('/', async(req, res ) => {
     try{
         const [rows] = await pool.query(table.SelectAll());
 
-        rows.forEach(row =>
-            {
-                row.formattedDate = new Date(row.DATESTAMP).toLocaleDateString('ru-RU');
-                row.file_yes = row.FILEPATH !== '';   
-            }
-        )
+        bind_rows(rows);
 
         res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER});
 
@@ -109,6 +115,26 @@ app.get('/delete_all', async(req, res ) => {
 
     try{
         res.render('confirm', {title : 'Удление всех записей'});
+    }
+    catch(err){
+        console.error('Ошибка при получении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
+
+
+app.get('/dowloand_file/:filename', async(req, res ) => {
+
+    try{
+        const fileName = req.params.filename;
+        const filePath = path.join(__dirname, 'uploads', fileName);
+
+        res.download(filePath, fileName, (err) => {
+            if (err) {
+            // Ошибка, если файл не найден или оборвалось соединение
+            res.status(404).send('Файл не найден');
+            }
+        });      
     }
     catch(err){
         console.error('Ошибка при получении данных:', err);
@@ -167,7 +193,7 @@ app.get('/view/:id', async(req, res ) => {
         row[0].forEach(elem => {
             elem.formattedDate = convert_data(new Date(elem.DATESTAMP).toLocaleDateString('ru-RU')); 
         });
-        res.render('view', {title : 'Изменение записи заявки', row : row[0], statuses : STATUS_ORDER}); 
+        res.render('view', {title : 'Изменение записи заявки', row : row[0], statuses : STATUS_ORDER, type:TYPE_ORDER}); 
 
     }
     catch(err){
@@ -181,6 +207,9 @@ app.post('/add',upload.single('file'), async(req, res) => {
     
         const text_from = req.body.name;
         const status_order = req.body.orderStatus;
+        const type_order = req.body.orderType;
+        const comments = req.body.text_field;
+
         let date_ = new Date().toISOString().slice(0, 19).replace('T', ' ');
         let filedata = req.file;
 
@@ -219,7 +248,7 @@ app.post('/add',upload.single('file'), async(req, res) => {
         }        
 
         try{
-            const [rows] = await pool.query(table.Insert(), [text_from, status_order, date_, filedata.filename]);   
+            const [rows] = await pool.query(table.Insert(), [text_from, status_order, date_, filedata.filename, type_order, comments]);   
             
             
             res.redirect('/'); 
@@ -236,7 +265,7 @@ app.get('/add', async(req, res) => {
     
     try{
     
-        res.render('add', {title : 'Добавление новой заявки', statuses : STATUS_ORDER});
+        res.render('add', {title : 'Добавление новой заявки', statuses : STATUS_ORDER,  type:TYPE_ORDER});
 
     }
     catch(err){
@@ -262,12 +291,8 @@ app.post('/filter', async(req, res) => {
            [rows] = await pool.query(table.SelectAll());    
         }
 
+        bind_rows(rows);
 
-        rows.forEach(row =>
-            {
-                row.formattedDate = new Date(row.DATESTAMP).toLocaleDateString('ru-RU');  
-            }
-        )
         res.send({rows : rows, length : rows.length, statuses : STATUS_ORDER});
 
     }
