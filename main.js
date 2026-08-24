@@ -8,11 +8,13 @@ import express from 'express';
 import path from 'path';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import console from 'console';
 import moment from 'moment';
 import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
 
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
@@ -31,6 +33,9 @@ const dbConfig = {
   password: '1234',
   database: 'test'
 };
+
+const rawData = fs.readFileSync(`${__dirname}/api.json`, 'utf8');
+const apiConfig = JSON.parse(rawData);
 
 const pool = mysql.createPool(dbConfig);
 const table = new Table('my_orders');
