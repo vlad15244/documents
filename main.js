@@ -107,7 +107,7 @@ app.get('/', async(req, res ) => {
 
         bind_rows(rows);
 
-        res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER});
+        res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER, api : apiConfig});
 
     }
     catch(err){
@@ -126,6 +126,42 @@ app.get('/delete_all', async(req, res ) => {
         res.status(500).send('Ошибка сервера: не удалось загрузить данные');
     }
 });
+
+
+app.post('/api/request', async(req, res) =>
+    {
+
+        const { prompt } = req.body;
+        const apiKey = apiConfig.api_key;
+        const url_k = apiConfig.url;
+        
+        const response = await fetch(
+            'https://ai.api.cloud.yandex.net/v1/responses',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Api-Key ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        modelUri: `${url_k}`,
+                        messages: [
+                            { role: 'user', text: prompt }
+                        ]})             
+                }
+        )
+
+        if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        return res.status(response.status).json({ error: errData.message || 'Ошибка API' });
+        }
+
+        const data = await response.json();
+        const answer = data.result?.alternatives?.[0]?.message?.text || 'Нет ответа';
+
+        res.json({ answer });
+    }
+
+);
 
 
 app.get('/dowloand_file/:filename', async(req, res ) => {

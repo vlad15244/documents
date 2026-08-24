@@ -166,5 +166,31 @@
   <form action="/delete_all" method="get">
     <button class = "in_cell" type="submit">Удалить все</button>
   </form>
+
+    <form>
+      <button name="request">Запрос</button> 
+
+      <script>
+        const req_btn = document.getElementsByName("request")[0];
+
+        if (req_btn) {
+          req_btn.addEventListener('click', async () => {
+            try {
+              const response = await fetch('/api/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: 'Что ты умеешь делать' }) 
+              });
+
+              const data = await response.json();
+              console.log(data);
+            } catch (err) {
+              console.error('Ошибка:', err);
+            }
+          });
+        }
+      </script> 
+  </form>
 </body>
+
 </html>
