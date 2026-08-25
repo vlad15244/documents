@@ -168,10 +168,10 @@
   </form>
 
     <form>
-      <button name="request">Запрос</button> 
+      <button id="api_req "name="request">Запрос</button> 
 
       <script>
-        const req_btn = document.getElementsByName("request")[0];
+        const req_btn = document.getElementById("api_req");
 
         if (req_btn) {
           req_btn.addEventListener('click', async () => {

@@ -134,7 +134,7 @@ app.post('/api/request', async(req, res) =>
         const { prompt } = req.body;
         const apiKey = apiConfig.api_key;
         const url_k = apiConfig.url;
-        
+
         const response = await fetch(
             'https://ai.api.cloud.yandex.net/v1/responses',{
                     method: 'POST',
@@ -157,7 +157,6 @@ app.post('/api/request', async(req, res) =>
 
         const data = await response.json();
         const answer = data.result?.alternatives?.[0]?.message?.text || 'Нет ответа';
-
         res.json({ answer });
     }
 
