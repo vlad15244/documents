@@ -39,6 +39,7 @@ const apiConfig = JSON.parse(rawData);
 
 const pool = mysql.createPool(dbConfig);
 const table = new Table('my_orders');
+const users_table = new Table('users');
 const app = express();
 app.use(express.json()); 
 
@@ -87,9 +88,16 @@ const TYPE_ORDER = {
 
     table.Verification();
 
+    users_table.AddColumn(new Column('ID', 'BIGINT','NOT NULL AUTO_INCREMENT', true));
+    users_table.AddColumn(new Column('USER_NAME', 'VARCHAR(45)', 'NOT NULL', false)); //Пользователь
+    users_table.AddColumn(new Column('USER_PASSWORD', 'VARCHAR(45)', 'NOT NULL', false)); //ПАРОЛЬ
+    users_table.AddColumn(new Column('GROUP_USER', 'TINYINT', 'NOT NULL', false)); //Группа пользователей    
+
+    users_table.Verification();
 
     try {
         await connection.execute(table.CreateTable());
+        await connection.execute(users_table.CreateTable());        
         console.log('Table created or already exists'); 
     } catch(err){
         console.log(`Error ${err} while connect with database`); 
@@ -108,6 +116,21 @@ app.get('/', async(req, res ) => {
         bind_rows(rows);
 
         res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER, api : apiConfig});
+
+    }
+    catch(err){
+        console.error('Ошибка при получении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
+
+app.get('/login', async(req, res ) => {
+
+    try{
+
+
+
+        res.render('login', {title : 'Страница авторизации'});
 
     }
     catch(err){
