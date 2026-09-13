@@ -8,8 +8,12 @@
 </head>
 <body>
 
-
+  <p>Текущий пользователь:<%= user.name %></p>
+  
   <h1><%= title %></h1>
+
+
+
   <% if (data_yes) { %>
   <form action="/sorted" method="get">
       <select name="orderStatus" id="orderStatus">

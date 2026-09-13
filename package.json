@@ -6,9 +6,11 @@
   "description": "",
   "dependencies": {
     "aws-ssl-profiles": "^1.1.2",
+    "cookie-parser": "^1.4.7",
     "denque": "^2.1.0",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
     "generate-function": "^2.3.1",
     "iconv-lite": "^0.7.2",
     "is-property": "^1.0.2",

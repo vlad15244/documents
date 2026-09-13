@@ -1,5 +1,6 @@
 import { Table } from './database.js';
 import { Column } from './database.js';
+import { User } from './user_config.js'
 import {convert_data} from './library.js';
 import {bind_rows} from './library.js';
 import mysql from 'mysql2/promise';
@@ -12,6 +13,8 @@ import { dirname } from 'path';
 import console from 'console';
 import moment from 'moment';
 import fs from 'fs';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const __filename = fileURLToPath(import.meta.url);
@@ -34,14 +37,32 @@ const dbConfig = {
   database: 'test'
 };
 
+
 const rawData = fs.readFileSync(`${__dirname}/api.json`, 'utf8');
 const apiConfig = JSON.parse(rawData);
+
+const env = fs.readFileSync(`${__dirname}/env.json`, 'utf8');
+const envConfig = JSON.parse(env);
 
 const pool = mysql.createPool(dbConfig);
 const table = new Table('my_orders');
 const users_table = new Table('users');
+
+const current_user = new User();
+
 const app = express();
-app.use(express.json()); 
+app.use(express.json());
+app.use(cookieParser()); 
+app.use(session({
+  secret: envConfig.SECRET_KEY, // 
+  resave: false,                 
+  saveUninitialized: false,      
+  cookie: { 
+    secure: false,               
+    httpOnly: true,              
+    maxAge: 24 * 60 * 60 * 1000 
+  }
+}));
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -115,7 +136,7 @@ app.get('/', async(req, res ) => {
 
         bind_rows(rows);
 
-        res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER, api : apiConfig});
+        res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER, api : apiConfig, user : current_user});
 
     }
     catch(err){
@@ -147,11 +168,13 @@ app.post('/login', async(req, res ) => {
 
         const [rows] = await pool.query(query, [user, password]); 
 
-        console.log(rows.length); 
-        
+
         if (!(rows.length == 0)){
-            
-                            
+
+            current_user.Login(rows[0].USER_NAME, rows[0].USER_PASSWORD, rows[0].GROUP_USER);
+            req.session.userData = { name : current_user.USER_NAME, active : current_user.active};
+            res.redirect('/'); 
+
         }
         else
         {
