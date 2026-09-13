@@ -9,7 +9,12 @@
 <body>
 
 <% if (user) { %>
-  <p>Привет, <%= user.USER_NAME %>!</p>
+  <p>Текущий пользователь: <%= user.USER_NAME %>!</p>
+  <% if (user.GROUP_USER == 1) { %>
+  <form action="/admin" method="get">
+    <button type="submit">Администрирование</button>
+  </form>    
+  <% } %>
 <% } %>
 
   <h1><%= title %></h1>
