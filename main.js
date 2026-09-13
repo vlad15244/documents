@@ -128,9 +128,36 @@ app.get('/login', async(req, res ) => {
 
     try{
 
-
-
         res.render('login', {title : 'Страница авторизации'});
+
+    }
+    catch(err){
+        console.error('Ошибка при получении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
+
+app.post('/login', async(req, res ) => {
+
+    try{
+        const user = req.body.user_name;
+        const password = req.body.user_password;  
+
+        const query =  users_table.Filter('USER_NAME', 'USER_PASSWORD');
+
+        const [rows] = await pool.query(query, [user, password]); 
+
+        console.log(rows.length); 
+        
+        if (!(rows.length == 0)){
+            
+                            
+        }
+        else
+        {
+            console.log("Пользователь не найден");  
+        }
+       
 
     }
     catch(err){
@@ -142,7 +169,7 @@ app.get('/login', async(req, res ) => {
 app.get('/delete_all', async(req, res ) => {
 
     try{
-        res.render('confirm', {title : 'Удление всех записей'});
+        res.render('confirm', {title : 'Удаление всех записей'});
     }
     catch(err){
         console.error('Ошибка при получении данных:', err);

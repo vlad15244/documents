@@ -76,13 +76,11 @@ export class Table{
     } 
     
     Filter(...args){
-        let Query = `SELECT * FROM ${this.name} WHERE `;
+        const fields = args;
 
-        for (const agr of args){
-            Query += `${agr} = ? AND`;
-        }
-        
-        Query = Query.slice(0, -3);
+        let Query = `SELECT * FROM ${this.name} WHERE `;
+        const ParamsString = args.map((char) => `${char} = ?`).join(' AND ');
+        Query += ParamsString;
 
         return Query;             
     }

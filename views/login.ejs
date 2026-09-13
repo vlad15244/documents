@@ -6,9 +6,11 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <div id="login_windows">
+  <form action="/login" method="post">
     <label for="user_name">Имя пользователя</label>
-    <input type="text" id="user_name">
+    <input type="text" id="user_name" name="user_name">
     <label for="user_password">Пароль</label>    
-    <input type="text" id="user_password">      
-    <button type="submit">Войти</button>    
-</div>
+    <input type="text" id="user_password" name="user_password">      
+    <button type="submit">Войти</button>   
+  </form>
+ </div>
