@@ -1,6 +1,6 @@
 import { Table } from './database.js';
 import { Column } from './database.js';
-import { User } from './user_config.js'
+
 import {convert_data} from './library.js';
 import {bind_rows} from './library.js';
 import mysql from 'mysql2/promise';
@@ -47,8 +47,6 @@ const envConfig = JSON.parse(env);
 const pool = mysql.createPool(dbConfig);
 const table = new Table('my_orders');
 const users_table = new Table('users');
-
-const current_user = new User();
 
 const app = express();
 app.use(express.json());
@@ -132,11 +130,19 @@ const TYPE_ORDER = {
 app.get('/', async(req, res ) => {
 
     try{
-        const [rows] = await pool.query(table.SelectAll());
 
-        bind_rows(rows);
+        if (req.session.user){
+            const [rows] = await pool.query(table.SelectAll());
 
-        res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER, api : apiConfig, user : current_user});
+            bind_rows(rows);
+
+            res.render('index', {title : 'Список заявок на оборудование', rows : rows, data_yes : rows.length > 0, statuses : STATUS_ORDER, api : apiConfig, user: req.session.user });
+        }
+        else
+        {
+            res.redirect('/login');            
+        }
+
 
     }
     catch(err){
@@ -171,8 +177,13 @@ app.post('/login', async(req, res ) => {
 
         if (!(rows.length == 0)){
 
-            current_user.Login(rows[0].USER_NAME, rows[0].USER_PASSWORD, rows[0].GROUP_USER);
-            req.session.userData = { name : current_user.USER_NAME, active : current_user.active};
+            req.session.user = {
+                USER_NAME : rows[0].USER_NAME,
+                GROUP_USER : rows[0].GROUP_USER,
+                ACTIVE : true, 
+
+            }
+
             res.redirect('/'); 
 
         }

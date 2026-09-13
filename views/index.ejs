@@ -8,8 +8,10 @@
 </head>
 <body>
 
-  <p>Текущий пользователь:<%= user.name %></p>
-  
+<% if (user) { %>
+  <p>Привет, <%= user.USER_NAME %>!</p>
+<% } %>
+
   <h1><%= title %></h1>
 
 
