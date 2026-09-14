@@ -147,7 +147,7 @@ app.get('/', async(req, res ) => {
         }
         else
         {
-            res.redirect('/login');            
+            res.render('login', {title : 'Страница авторизации', error : false, message : ""});            
         }
 
 
@@ -162,7 +162,7 @@ app.get('/login', async(req, res ) => {
 
     try{
 
-        res.render('login', {title : 'Страница авторизации'});
+        res.render('login', {title : 'Страница авторизации', error : false, message : ""});
 
     }
     catch(err){
@@ -191,20 +191,10 @@ app.post('/add_user', async(req, res ) => {
         //добавляем нового пользователя
         const user_name = req.body.name_user;
         const user_password = await hashPassword(req.body.password_user);
-        console.log(user_password);
-        try{
-            const [rows] = await pool.query(users_table.Insert(), [user_name, user_password,1]);   
-            
-            
-            res.redirect('/'); 
-        }
-        catch(err){
-            console.error('Ошибка при добавлении данных:', err);
-            res.status(500).send('Ошибка сервера: не удалось загрузить данные');            
+        const group = req.body.UserGroup;
+        const [rows] = await pool.query(users_table.Insert(), [user_name, user_password,group]);   
 
-        }       
-
-        res.redirect('/admin'); 
+        res.redirect('/admin'); //перенаправляем на список пользователей
 
     }
     catch(err){
@@ -217,7 +207,7 @@ app.get('/add_user', async(req, res ) => {
 
     try{
 
-        res.render('add_user', {title : 'Добавление нового пользователя'}); 
+        res.render('add_user', {title : 'Добавление нового пользователя', type : TYPE_GROUP_USER}); 
 
     }
     catch(err){
@@ -231,23 +221,26 @@ app.post('/login', async(req, res ) => {
     try{
 
         const user = req.body.user_name;
-        const password = req.body.user_password;  
+        const password = req.body.user_password;
 
-        const query =  users_table.Filter('USER_NAME', 'USER_PASSWORD');
-
-        const [rows] = await pool.query(query, [user, password]); 
-
+        const query =  users_table.Filter('USER_NAME');
+        const [rows] = await pool.query(query, [user]); 
 
         if (!(rows.length == 0)){
 
-            req.session.user = {
-                USER_NAME : rows[0].USER_NAME,
-                GROUP_USER : rows[0].GROUP_USER,
-                ACTIVE : true, 
+            const isCheck = await isCorrectPassword(password, rows[0].USER_PASSWORD);
 
+            if(isCheck){
+                req.session.user = {
+                    USER_NAME : rows[0].USER_NAME,
+                    GROUP_USER : rows[0].GROUP_USER,
+                    ACTIVE : true, 
+                }
+                res.redirect('/'); 
             }
-
-            res.redirect('/'); 
+            else{
+                res.render('login', {title : 'Страница авторизации', error : true, message : "Некорректные имя пользователя и/или пароль"});                
+            }
 
         }
         else

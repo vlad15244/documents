@@ -16,7 +16,7 @@ export async function hashPassword(password_from_db) {
 /*функция проверки пароль по хеш*/
 export async function isCorrectPassword(password, hash) {
     try{
-        const isCorrect = await bcrypt.compare(inputPassword, storedHash);
+        const isCorrect = await bcrypt.compare(password, hash);
         return isCorrect;
     } catch(error){
         console.error('Ошибка сравнения:', error);
