@@ -93,6 +93,11 @@ const TYPE_ORDER = {
   devices: { label: 'Другое', color: '#a74b15', text : 'devices' }   
 };
 
+const TYPE_GROUP_USER = {
+  1: { label: 'Администратор', text : 'admin' },   
+  2: { label: 'Пользователь', text : 'user' }
+};
+
 
 (async () => {
     const connection = await pool.getConnection();
@@ -169,14 +174,7 @@ app.get('/admin', async(req, res ) => {
     try{
         const [rows] = await pool.query(users_table.Fields('ID','USER_NAME','GROUP_USER'));
 
-        /*req.session.user = {
-            USER_NAME : rows[0].USER_NAME,
-            GROUP_USER : rows[0].GROUP_USER,
-            ACTIVE : true, 
-
-        }*/
-
-        res.render('admin', {title : 'Администрирование', rows : rows, user : req.session.user});
+        res.render('admin', {title : 'Администрирование', rows : rows, user : req.session.user, type : TYPE_GROUP_USER});
 
     }
     catch(err){

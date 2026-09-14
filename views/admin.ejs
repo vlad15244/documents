@@ -23,7 +23,9 @@
         <tr>
           <td><%= row.ID %></td>
           <td><%= row.USER_NAME %></td>
-          <td><%= row.GROUP_USER %></td>                                   
+          <td>
+            <%= type[row.GROUP_USER] ? type[row.GROUP_USER].label : row.GROUP_USER %>
+          </td>                                   
         </tr>
       <% }); %>
     <% } else { %>
