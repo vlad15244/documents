@@ -9,6 +9,29 @@
     <% if (user) { %>
         <p>Текущий пользователь: <%= user.USER_NAME %>!</p>
     <% } %>
-
+<table id="table_order">
+  <thead>
+    <tr>
+      <th>ID пользователя</th>
+      <th>Имя пользователя</th>
+      <th>Группа</th> 
+    </tr>
+  </thead>
+  <tbody>
+    <% if (rows && rows.length > 0) { %>
+      <% rows.forEach(row => { %> 
+        <tr>
+          <td><%= row.ID %></td>
+          <td><%= row.USER_NAME %></td>
+          <td><%= row.GROUP_USER %></td>                                   
+        </tr>
+      <% }); %>
+    <% } else { %>
+      <tr>
+        <td colspan="6" style="text-align:center;">Список пользоватей пуст</td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
     
 </body>

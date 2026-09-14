@@ -169,12 +169,12 @@ app.get('/admin', async(req, res ) => {
     try{
         const [rows] = await pool.query(users_table.Fields('ID','USER_NAME','GROUP_USER'));
 
-        req.session.user = {
+        /*req.session.user = {
             USER_NAME : rows[0].USER_NAME,
             GROUP_USER : rows[0].GROUP_USER,
             ACTIVE : true, 
 
-        }
+        }*/
 
         res.render('admin', {title : 'Администрирование', rows : rows, user : req.session.user});
 
