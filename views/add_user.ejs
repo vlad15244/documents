@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <h1>Данные для добавления</h1>
+
+    <form action="/add_user" method="post">
+      <div>
+        <label for="name_user">Имя пользователя</label>
+        <input type="text" id="name_user" name="name_user" placeholder="Введите имя пользователя">
+      </div>
+
+      <div>
+        <label for="password_user">Пароль</label>
+        <input type="text" id="password_user" name="password_user">
+      </div>
+      <button type="submit">Добавить</button>
+    </form>
+  </body>
+</html>

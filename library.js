@@ -1,3 +1,29 @@
+
+import bcrypt from 'bcrypt';
+
+/*формирование ХЕШа пароля*/
+export async function hashPassword(password_from_db) {
+    const saltRound = 10; //сложность хеширования
+    try{
+        const hash = await bcrypt.hash(password_from_db, saltRound);
+        return hash;        
+    } catch (error){
+        console.error('Ошибка хеширования:', error);
+        throw error;       
+    }
+}
+
+/*функция проверки пароль по хеш*/
+export async function isCorrectPassword(password, hash) {
+    try{
+        const isCorrect = await bcrypt.compare(inputPassword, storedHash);
+        return isCorrect;
+    } catch(error){
+        console.error('Ошибка сравнения:', error);
+        throw error;  
+    }
+}
+
 /* приведение вида даты к HTML форме input */
 
 export function convert_data(date_in){

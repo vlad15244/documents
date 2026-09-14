@@ -3,6 +3,8 @@ import { Column } from './database.js';
 
 import {convert_data} from './library.js';
 import {bind_rows} from './library.js';
+import {hashPassword} from './library.js';
+import {isCorrectPassword} from './library.js';
 import mysql from 'mysql2/promise';
 import http from 'http';
 import express from 'express';
@@ -151,7 +153,7 @@ app.get('/', async(req, res ) => {
 
     }
     catch(err){
-        console.error('Ошибка при получении данных:', err);
+        console.error('Ошибка при получении данных ----:', err);
         res.status(500).send('Ошибка сервера: не удалось загрузить данные');
     }
 });
@@ -183,9 +185,51 @@ app.get('/admin', async(req, res ) => {
     }
 });
 
+app.post('/add_user', async(req, res ) => {
+
+    try{
+        //добавляем нового пользователя
+        const user_name = req.body.name_user;
+        const user_password = await hashPassword(req.body.password_user);
+        console.log(user_password);
+        try{
+            const [rows] = await pool.query(users_table.Insert(), [user_name, user_password,1]);   
+            
+            
+            res.redirect('/'); 
+        }
+        catch(err){
+            console.error('Ошибка при добавлении данных:', err);
+            res.status(500).send('Ошибка сервера: не удалось загрузить данные');            
+
+        }       
+
+        res.redirect('/admin'); 
+
+    }
+    catch(err){
+        console.error('Ошибка при получении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
+
+app.get('/add_user', async(req, res ) => {
+
+    try{
+
+        res.render('add_user', {title : 'Добавление нового пользователя'}); 
+
+    }
+    catch(err){
+        console.error('Ошибка при получении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
+
 app.post('/login', async(req, res ) => {
 
     try{
+
         const user = req.body.user_name;
         const password = req.body.user_password;  
 
