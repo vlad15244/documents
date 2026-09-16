@@ -22,7 +22,7 @@ export async function ExportToLogin(table, rows){
 
 
     rows.forEach(row =>{
-        worksheet.addRow({ID: row.ID, NUMBER: row.NUMBER, STATUS:row.STATUS})        
+        worksheet.addRow({ID: row.ID, NUMBER: row.NUMBER, STATUS:row.STATUS})  //Заменить на динамиечское создние из таблицы      
     }
 
     )    
