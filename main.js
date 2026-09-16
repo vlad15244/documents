@@ -1,6 +1,6 @@
 import { Table } from './database.js';
 import { Column } from './database.js';
-
+import { ExportToLogin } from './excel.js';
 import {convert_data} from './library.js';
 import {bind_rows} from './library.js';
 import {hashPassword} from './library.js';
@@ -216,6 +216,16 @@ app.get('/add_user', async(req, res ) => {
         res.status(500).send('Ошибка сервера: не удалось загрузить данные');
     }
 });
+
+app.get('/export', async(req, res) => {
+    try{
+        const row = [];
+        ExportToLogin(table, row);
+    }
+    catch(err){
+
+    }
+})
 
 app.post('/login', async(req, res ) => {
 

@@ -1,6 +1,6 @@
 import exceljs from 'exceljs';
 
-async function ExportToLogin(table, rows){
+export async function ExportToLogin(table, rows){
     // Создаем новую книгу
     const workbook = new exceljs.Workbook();
 
@@ -20,6 +20,7 @@ async function ExportToLogin(table, rows){
             size: field.size        
         }));
 
-
+    await workbook.xlsx.writeFile('orders.xlsx');
+    console.log('файл создан');
 
 }
