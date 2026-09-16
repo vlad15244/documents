@@ -46,7 +46,6 @@ export class Table{
 
     }
 
-
     AddColumn(tableColumn){
         this.columns.push(tableColumn);
     }

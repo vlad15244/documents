@@ -221,9 +221,12 @@ app.get('/export', async(req, res) => {
     try{
         const [rows] = await pool.query(table.SelectAll());
         ExportToLogin(table, rows);
+
+        res.redirect('/'); 
     }
     catch(err){
-
+        console.error('Ошибка при формировании файла:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
     }
 })
 
@@ -256,7 +259,8 @@ app.post('/login', async(req, res ) => {
         }
         else
         {
-            console.log("Пользователь не найден");  
+            console.log("Пользователь не найден");
+            res.render('login', {title : 'Страница авторизации', error : true, message : "Некорректные имя пользователя и/или пароль"});   
         }
        
 

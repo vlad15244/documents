@@ -25,7 +25,12 @@
           <td><%= row.USER_NAME %></td>
           <td>
             <%= type[row.GROUP_USER] ? type[row.GROUP_USER].label : row.GROUP_USER %>
-          </td>                                   
+          </td>
+          <td style="text-align: center; vertical-align: middle;">
+            <form action="/delete_user/<%= row.ID %>" method="get">
+              <button type="submit" style="padding: 5px 10px; background-color: #ffcccc;">Удалить</button>
+            </form>
+          </td>                                     
         </tr>
       <% }); %>
     <% } else { %>
