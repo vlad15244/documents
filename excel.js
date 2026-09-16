@@ -20,6 +20,12 @@ export async function ExportToLogin(table, rows){
             size: field.size        
         }));
 
+
+    rows.forEach(row =>{
+        worksheet.addRow({ID: row.ID, NUMBER: row.NUMBER, STATUS:row.STATUS})        
+    }
+
+    )    
     await workbook.xlsx.writeFile('orders.xlsx');
     console.log('файл создан');
 

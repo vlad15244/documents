@@ -219,8 +219,8 @@ app.get('/add_user', async(req, res ) => {
 
 app.get('/export', async(req, res) => {
     try{
-        const row = [];
-        ExportToLogin(table, row);
+        const [rows] = await pool.query(table.SelectAll());
+        ExportToLogin(table, rows);
     }
     catch(err){
 
