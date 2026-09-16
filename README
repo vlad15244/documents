@@ -2,3 +2,4 @@ For work need
 npm install mysql2
 npm install express-session cookie-parser
 npm install bcrypt
+npm install exceljs
