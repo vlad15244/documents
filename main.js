@@ -237,32 +237,42 @@ app.post('/login', async(req, res ) => {
         const user = req.body.user_name;
         const password = req.body.user_password;
 
-        const query =  users_table.Filter('USER_NAME');
-        const [rows] = await pool.query(query, [user]); 
-
-        if (!(rows.length == 0)){
-
-            const isCheck = await isCorrectPassword(password, rows[0].USER_PASSWORD);
-
-            if(isCheck){
-                req.session.user = {
-                    USER_NAME : rows[0].USER_NAME,
-                    GROUP_USER : rows[0].GROUP_USER,
-                    ACTIVE : true, 
-                }
-                res.redirect('/'); 
+        // Если зашли суперпользователем
+        if (user == envConfig.superuser){
+            if (password == envConfig.password){
+                res.redirect('/admin'); //перенаправляем на список пользователей                
             }
-            else{
-                res.render('login', {title : 'Страница авторизации', error : true, message : "Некорректные имя пользователя и/или пароль"});                
-            }
-
         }
         else
         {
-            console.log("Пользователь не найден");
-            res.render('login', {title : 'Страница авторизации', error : true, message : "Некорректные имя пользователя и/или пароль"});   
+            const query =  users_table.Filter('USER_NAME');
+            const [rows] = await pool.query(query, [user]); 
+
+
+            if (!(rows.length == 0)){
+
+                const isCheck = await isCorrectPassword(password, rows[0].USER_PASSWORD);
+
+                if(isCheck){
+                    req.session.user = {
+                        USER_NAME : rows[0].USER_NAME,
+                        GROUP_USER : rows[0].GROUP_USER,
+                        ACTIVE : true, 
+                    }
+                    res.redirect('/'); 
+                }
+                else{
+                    res.render('login', {title : 'Страница авторизации', error : true, message : "Некорректные имя пользователя и/или пароль"});                
+                }
+
+            }
+            else
+            {
+                console.log("Пользователь не найден");
+                res.render('login', {title : 'Страница авторизации', error : true, message : "Некорректные имя пользователя и/или пароль"});   
+            }
         }
-       
+
 
     }
     catch(err){
