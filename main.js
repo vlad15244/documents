@@ -6,6 +6,7 @@ import {bind_rows} from './library.js';
 import {hashPassword} from './library.js';
 import {isCorrectPassword} from './library.js';
 import {mysqlNow} from './library.js';
+import {mysqlFormat} from './library.js';
 import mysql from 'mysql2/promise';
 import http from 'http';
 import express from 'express';
@@ -186,8 +187,13 @@ app.get('/admin', async(req, res ) => {
 
     try{
         const [rows] = await pool.query(users_table.Fields('ID','USER_NAME','GROUP_USER'));
+        const [actions] = await pool.query(auth_action.SelectAll());
 
-        res.render('admin', {title : 'Администрирование', rows : rows, user : req.session.user, type : TYPE_GROUP_USER});
+        actions.forEach(action =>{
+           action.formattedDate = mysqlFormat(action.DATESTAMP_ACTION); 
+        })
+
+        res.render('admin', {title : 'Администрирование', rows : rows, user : req.session.user, type : TYPE_GROUP_USER, actions : actions});
 
     }
     catch(err){
@@ -489,7 +495,7 @@ app.post('/add',upload.single('file'), async(req, res) => {
         }        
 
         try{
-            
+
             const [rows] = await pool.query(table.Insert(), [text_from, status_order, date_, filedata.filename, type_order, comments]);   
             const [db_response] = await pool.query(auth_action.Insert(), [mysqlNow(),"","Добавлена новая заявка"]); 
 

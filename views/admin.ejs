@@ -43,6 +43,34 @@
    <form action="/add_user" method="get">
     <button class = "in_cell" type="submit">Добавить пользователя</button>
   </form> 
+<table id="table_actions">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Время</th>
+      <th>Пользователь</th>
+      <th>Действие</th>       
+    </tr>
+  </thead>
+  <tbody>
+    <% if (actions && actions.length > 0) { %>
+      <% actions.forEach(action => { %> 
+        <tr>
+          <td><%= action.ID %></td>
+          <td><%= action.formattedDate %></td>
+          <td><%= action.USER_NAME %></td> 
+          <td><%= action.ACTION %></td>                                               
+        </tr>
+      <% }); %>
+    <% } else { %>
+      <tr>
+        <td colspan="6" style="text-align:center;">Список действий пуст</td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+
+
    <form action="/" method="get">
     <button class = "in_cell" type="submit">Выход из панели администрирования</button>
   </form>   

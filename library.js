@@ -48,3 +48,8 @@ export function bind_rows(rows){
 export function mysqlNow() {
   return new Date().toISOString().slice(0, 19).replace('T', ' ');
 }
+
+/*Текущее время для визулизации */
+export function mysqlFormat(date) {
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+}
