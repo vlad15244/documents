@@ -371,6 +371,18 @@ app.get('/delete_user/:id', async(req, res ) => {
     }
 });
 
+app.post('/delete_user/:id', async(req, res ) => {
+
+    try{
+        const [rows] = await pool.query(users_table.Delete(), req.params.id);
+        res.redirect('/admin');                  
+    }
+    catch(err){
+        console.error('Ошибка при удалении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
+
 app.post('/update/:id', async(req, res ) => {
 
     try{
