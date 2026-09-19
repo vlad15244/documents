@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<form action="/delete_user/<%= id %>" method="post">
+    <button class = "in_cell" type="submit">Удалить пользователя</button>
+  </form> 
+   <form action="/admin" method="get">
+    <button class = "in_cell" type="submit">Выход</button>
+  </form>  
+</body>

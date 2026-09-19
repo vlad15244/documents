@@ -360,6 +360,17 @@ app.post('/delete_all', async(req, res ) => {
     }
 });
 
+app.get('/delete_user/:id', async(req, res ) => {
+
+    try{
+        res.render('confirm_delete_user', {title : 'Удаление пользователя', id : req.params.id});       
+    }
+    catch(err){
+        console.error('Ошибка при удалении данных:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');
+    }
+});
+
 app.post('/update/:id', async(req, res ) => {
 
     try{
