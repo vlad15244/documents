@@ -5,6 +5,7 @@ import {convert_data} from './library.js';
 import {bind_rows} from './library.js';
 import {hashPassword} from './library.js';
 import {isCorrectPassword} from './library.js';
+import {mysqlNow} from './library.js';
 import mysql from 'mysql2/promise';
 import http from 'http';
 import express from 'express';
@@ -50,6 +51,7 @@ const envConfig = JSON.parse(env);
 const pool = mysql.createPool(dbConfig);
 const table = new Table('my_orders');
 const users_table = new Table('users');
+const auth_action = new Table('auth_action');
 
 const app = express();
 app.use(express.json());
@@ -109,9 +111,9 @@ const TYPE_GROUP_USER = {
     table.AddColumn(new Column('NUMBER', 'BIGINT', 'NOT NULL', false)); //Номер заказ наряда
     table.AddColumn(new Column('STATUS', 'VARCHAR(45)', 'NOT NULL', false)); //Статус
     table.AddColumn(new Column('DATESTAMP', 'DATETIME', 'NOT NULL', false)); //Дата, когда сделана заявка 
-    table.AddColumn(new Column('FILEPATH', 'VARCHAR(500)', 'NULL', true)); //Наименование заявки 
+    table.AddColumn(new Column('FILEPATH', 'TEXT', 'NULL', true)); //Наименование заявки 
     table.AddColumn(new Column('TYPE_ORDER', 'VARCHAR(20)', 'NULL', true)); //Тип заявки - делаем не обновляемой.
-    table.AddColumn(new Column('COMMENTS', 'VARCHAR(500)', 'NULL', true)); //Просто комментарии                   
+    table.AddColumn(new Column('COMMENTS', 'TEXT', 'NULL', true)); //Просто комментарии                   
 
     table.Verification();
 
@@ -122,9 +124,17 @@ const TYPE_GROUP_USER = {
 
     users_table.Verification();
 
+    auth_action.AddColumn(new Column('ID', 'BIGINT','NOT NULL AUTO_INCREMENT', true));
+    auth_action.AddColumn(new Column('DATESTAMP_ACTION', 'DATETIME', 'NOT NULL', false));
+    auth_action.AddColumn(new Column('USER_NAME', 'VARCHAR(45)', 'NOT NULL', false)); //Пользователь
+    auth_action.AddColumn(new Column('ACTION', 'TEXT', 'NOT NULL', false)); //Пользователь     
+
+
+
     try {
         await connection.execute(table.CreateTable());
-        await connection.execute(users_table.CreateTable());        
+        await connection.execute(users_table.CreateTable());
+        await connection.execute(auth_action.CreateTable());                
         console.log('Table created or already exists'); 
     } catch(err){
         console.log(`Error ${err} while connect with database`); 
@@ -259,6 +269,9 @@ app.post('/login', async(req, res ) => {
                         GROUP_USER : rows[0].GROUP_USER,
                         ACTIVE : true, 
                     }
+
+                    //Записываем в таблицу историю
+                    const [db_response] = await pool.query(auth_action.Insert(), [mysqlNow(),rows[0].USER_NAME,"Пользователь успешно зарегистрирован в системе"]); 
                     res.redirect('/'); 
                 }
                 else{
@@ -476,9 +489,10 @@ app.post('/add',upload.single('file'), async(req, res) => {
         }        
 
         try{
+            
             const [rows] = await pool.query(table.Insert(), [text_from, status_order, date_, filedata.filename, type_order, comments]);   
-            
-            
+            const [db_response] = await pool.query(auth_action.Insert(), [mysqlNow(),"","Добавлена новая заявка"]); 
+
             res.redirect('/'); 
         }
         catch(err){
