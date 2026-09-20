@@ -6,6 +6,7 @@
   "description": "",
   "dependencies": {
     "aws-ssl-profiles": "^1.1.2",
+    "axios": "^1.20.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "denque": "^2.1.0",
