@@ -551,6 +551,19 @@ app.post('/filter', async(req, res) => {
 
 })
 
+app.get('/get_orders', async(req, res) =>{
+    try{
+        const url = `${envConfig.DRF_ip}/orders/`;
+        const response = await axios.get(url);
+        console.log(response.data);
+        res.redirect('/');
+    }    
+    catch(err){
+        console.error('Ошибка сервера:', err);
+        res.status(500).send('Ошибка сервера: не удалось загрузить данные');            
+    }
+})
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);
 });

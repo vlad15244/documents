@@ -3,3 +3,14 @@ npm install mysql2
 npm install express-session cookie-parser
 npm install bcrypt
 npm install exceljs
+npm install axios
+
+Need env.json
+{
+    "SECRET_KEY" : "",
+    "superuser" : "",
+    "password" : "",
+    "DRF_ip" : ""
+
+}
+
