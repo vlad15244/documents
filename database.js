@@ -95,6 +95,16 @@ export class Table{
         return Query;             
     }
 
+    FieldDistinct(field, count){
+
+        let Query = `SELECT `;
+        const ParamsString = args.join(' , ');
+        Query += ParamsString;
+        Query += ` FROM ${this.name}`;
+
+        return Query;           
+    }
+
     Insert(){
         let Query = `INSERT INTO ${this.name} (${this.getFullColumnName()}) VALUES (${this.getFullPlaceholders()})`;
 
@@ -148,6 +158,7 @@ export class Table{
 
         return Query;
     }
+
 
 
     Verification(){
